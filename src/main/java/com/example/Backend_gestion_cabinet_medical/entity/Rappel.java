@@ -17,7 +17,7 @@ public class Rappel {
     private LocalDateTime sendDate;
     private boolean sent;
 
-    // Relation avec Rendez-vous
+
     @ManyToOne
     @JoinColumn(name = "rendez_vous_id", nullable = false)
     private RendezVous rendezVous;

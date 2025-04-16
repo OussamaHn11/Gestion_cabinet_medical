@@ -5,7 +5,6 @@ import com.example.Backend_gestion_cabinet_medical.DTO.PatientRequest;
 import com.example.Backend_gestion_cabinet_medical.entity.DossierMedical;
 import com.example.Backend_gestion_cabinet_medical.entity.Patient;
 import com.example.Backend_gestion_cabinet_medical.entity.Utilisateur;
-import com.example.Backend_gestion_cabinet_medical.repository.DossierMedicalRepository;
 import com.example.Backend_gestion_cabinet_medical.repository.PatientRepository;
 import com.example.Backend_gestion_cabinet_medical.repository.UtilisateurRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PatientService {
     private final PatientRepository patientRepository;
-    private final DossierMedicalRepository dossierMedicalRepository;
     private final UtilisateurRepository utilisateurRepository;
 
     // Ajouter un patient

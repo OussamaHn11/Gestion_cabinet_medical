@@ -1,5 +1,6 @@
 package com.example.Backend_gestion_cabinet_medical.service;
 
+import com.example.Backend_gestion_cabinet_medical.DTO.RendezVousRequest;
 import com.example.Backend_gestion_cabinet_medical.entity.Patient;
 import com.example.Backend_gestion_cabinet_medical.entity.RendezVous;
 import com.example.Backend_gestion_cabinet_medical.repository.PatientRepository;
@@ -19,14 +20,16 @@ public class RendezVousService {
     private final PatientRepository patientRepository;
 
 
-    public RendezVous saveRendezVous(RendezVous rendezVous) {
+    public RendezVous saveRendezVous( RendezVousRequest request ) {
         // Vérifier si le patient existe
-        Long patientId = rendezVous.getPatient().getId();
-        Patient patient = patientRepository.findById(patientId)
+        Long patientId = request.getPatientId();
+        Patient patient = patientRepository.findById(request.getPatientId())
                 .orElseThrow(() -> new RuntimeException("Patient non trouvé"));
 
-        // Associer le patient au rendez-vous
+        RendezVous rendezVous = new RendezVous();
         rendezVous.setPatient(patient);
+        rendezVous.setDate(request.getDate());
+        rendezVous.setMotif(request.getMotif());
 
         // Enregistrer le rendez-vous
         return rendezVousRepository.save(rendezVous);
@@ -41,22 +44,26 @@ public class RendezVousService {
     }
 
 
-    public RendezVous updateRendezVous(Long id, RendezVous updatedRdv) {
+    public RendezVous updateRendezVous(Long id, RendezVousRequest request) {
         return rendezVousRepository.findById(id).map(rdv -> {
-            rdv.setDate(updatedRdv.getDate());
-            rdv.setMotif(updatedRdv.getMotif());
+            rdv.setDate(request.getDate());
+            rdv.setMotif(request.getMotif());
 
             // Vérifier et mettre à jour le patient
-            Long patientId = updatedRdv.getPatient().getId();
-            Patient patient = patientRepository.findById(patientId)
+            Patient patient = patientRepository.findById(request.getPatientId())
                     .orElseThrow(() -> new RuntimeException("Patient non trouvé"));
-
             rdv.setPatient(patient);
+
             return rendezVousRepository.save(rdv);
         }).orElseThrow(() -> new RuntimeException("Rendez-vous non trouvé"));
     }
 
+
     public void deleteRendezVous(Long id) {
+        if (!rendezVousRepository.existsById(id)) {
+            throw new RuntimeException("Rendez-vous non trouvé avec l'ID : " + id);
+        }
         rendezVousRepository.deleteById(id);
     }
+
 }

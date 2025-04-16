@@ -51,7 +51,7 @@ public class Patient {
     @JsonManagedReference
     private List<RendezVous> rendezVousList = new ArrayList<>();
 
-    // Méthode pour initialiser un dossier médical vide
+    // initialiser un dossier médical vide
     public void initializeEmptyMedicalRecord() {
         this.dossierMedical = new DossierMedical();
         this.dossierMedical.setPatient(this); // Liaison bidirectionnelle

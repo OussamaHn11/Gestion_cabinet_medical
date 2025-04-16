@@ -20,16 +20,20 @@ public class Consultation {
     private LocalDateTime date ;
 
 
-    // Relation ManyToOne avec Utilisateur (Médecin)
+
     @ManyToOne
     @JoinColumn(name = "utilisateur_id", nullable = false)
     private Utilisateur medecin;
 
-    // Relation OneToOne avec Ordonnance
+    @ManyToOne
+    @JoinColumn(name = "dossier_medical_id", nullable = false)
+    private DossierMedical dossierMedical;
+
+
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "consultation")
     private Ordonnance ordonnance;
 
-    // Relation OneToOne avec Certificat médical
+
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "consultation")
     private CertificatMedical certificatMedical;
 }

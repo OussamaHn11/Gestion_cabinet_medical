@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,6 +25,8 @@ public class DossierMedical {
     @JsonBackReference // Pour inclure cette propriété dans la réponse JSON
     private Patient patient;
 
+    @OneToMany(mappedBy = "dossierMedical", cascade = CascadeType.ALL)
+    private List<Consultation> consultations=new ArrayList<>();
 
 
 

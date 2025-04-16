@@ -38,7 +38,7 @@ public class Utilisateur {
 
 
 
-    // Relation OneToMany avec Patient
+
     @OneToMany(mappedBy = "utilisateur")  // Une secrétaire peut gerer plusieurs patients
     @JsonManagedReference
     private List<Patient> patients;

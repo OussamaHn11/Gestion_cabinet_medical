@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class PatientRequest {
+    private Long id;
     private String nom;
     private String prénom;
     private String telephone;
