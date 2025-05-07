@@ -2,7 +2,9 @@ package com.example.Backend_gestion_cabinet_medical.controller;
 
 import com.example.Backend_gestion_cabinet_medical.entity.Rappel;
 import com.example.Backend_gestion_cabinet_medical.repository.RappelRepository;
+import com.example.Backend_gestion_cabinet_medical.service.Rappel.RappelService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.List;
 @RequestMapping("/api/rappels")
 @RequiredArgsConstructor
 public class RappelController {
+    private final RappelService rappelService;
 
     private final RappelRepository rappelRepository;
 
@@ -24,4 +27,8 @@ public class RappelController {
                 .orElseThrow(() -> new RuntimeException("Rappel non trouvé"));
     }
 
-}
+    @PostMapping("/envoyer")
+    public ResponseEntity<String> envoyerRappels() {
+        rappelService.envoyerRappelsAutomatiques();
+        return ResponseEntity.ok("✅ Rappels envoyés avec succès !");
+    }}

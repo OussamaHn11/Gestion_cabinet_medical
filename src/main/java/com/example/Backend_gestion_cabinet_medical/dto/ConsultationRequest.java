@@ -1,8 +1,7 @@
-package com.example.Backend_gestion_cabinet_medical.DTO;
+package com.example.Backend_gestion_cabinet_medical.dto;
 
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 

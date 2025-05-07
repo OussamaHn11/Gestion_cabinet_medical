@@ -1,5 +1,5 @@
 package com.example.Backend_gestion_cabinet_medical.service;
-import com.example.Backend_gestion_cabinet_medical.DTO.ConsultationRequest;
+import com.example.Backend_gestion_cabinet_medical.dto.ConsultationRequest;
 import com.example.Backend_gestion_cabinet_medical.entity.Consultation;
 import com.example.Backend_gestion_cabinet_medical.entity.DossierMedical;
 import com.example.Backend_gestion_cabinet_medical.entity.Utilisateur;
@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +36,7 @@ public class ConsultationService {
         consultation.setDossierMedical(dossier);// Le dossier médical est lié
         consultation.setDate(LocalDateTime.now());  // La date de consultation est la date actuelle
         consultation.setDiagnostique(request.getDiagnostique());
+        consultation.setMedecin(medecin);
 
         // Sauvegarder la consultation dans la base de données
         return consultationRepository.save(consultation);
@@ -74,4 +74,9 @@ public class ConsultationService {
     public List<Consultation> getConsultationsByDossier(Long dossierId) {
         return consultationRepository.findByDossierMedicalId(dossierId);
     }
+
+    public List<Consultation> getAllConsultations() {
+        return consultationRepository.findAll();
+    }
+
 }

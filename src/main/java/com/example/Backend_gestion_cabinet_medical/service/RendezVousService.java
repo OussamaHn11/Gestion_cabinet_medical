@@ -1,13 +1,13 @@
 package com.example.Backend_gestion_cabinet_medical.service;
 
-import com.example.Backend_gestion_cabinet_medical.DTO.RendezVousRequest;
+import com.example.Backend_gestion_cabinet_medical.dto.RendezVousRequest;
 import com.example.Backend_gestion_cabinet_medical.entity.Patient;
 import com.example.Backend_gestion_cabinet_medical.entity.RendezVous;
+import com.example.Backend_gestion_cabinet_medical.entity.StatutRendezVous;
 import com.example.Backend_gestion_cabinet_medical.repository.PatientRepository;
 import com.example.Backend_gestion_cabinet_medical.repository.RendezVousRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +30,7 @@ public class RendezVousService {
         rendezVous.setPatient(patient);
         rendezVous.setDate(request.getDate());
         rendezVous.setMotif(request.getMotif());
+        rendezVous.setStatut(StatutRendezVous.EN_ATTENTE);
 
         // Enregistrer le rendez-vous
         return rendezVousRepository.save(rendezVous);
@@ -63,7 +64,21 @@ public class RendezVousService {
         if (!rendezVousRepository.existsById(id)) {
             throw new RuntimeException("Rendez-vous non trouvé avec l'ID : " + id);
         }
-        rendezVousRepository.deleteById(id);
+        rendezVousRepository.deleteById(id);}
+
+        public RendezVous confirmerRendezVous(Long id) {
+            RendezVous rdv = rendezVousRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Rendez-vous non trouvé"));
+            rdv.setStatut(StatutRendezVous.CONFIRME);
+            return rendezVousRepository.save(rdv);
+        }
+
+        public RendezVous annulerRendezVous(Long id) {
+            RendezVous rdv = rendezVousRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Rendez-vous non trouvé"));
+            rdv.setStatut(StatutRendezVous.ANNULE);
+            return rendezVousRepository.save(rdv);
+        }
     }
 
-}
+

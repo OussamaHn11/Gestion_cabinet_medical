@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -27,42 +29,56 @@ public class AuthController {
     private JwtService jwtService;
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        try {
-            // Ajouter l'utilisateur avec mot de passe encodé
-            service.ajouterUtilisateur(request.getUsername(), request.getPassword(), request.getEmail(), request.getNom(), request.getPrénom(), request.getTéléphone(),request.getRole());
-
-            // Réponse réussie
-            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Utilisateur ajouté avec succès"));
-
-        } catch (Exception e) {
-            log.error("🚨 Erreur d'ajout utilisateur : {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "Erreur interne lors de l'ajout de l'utilisateur"));
-        }
+        service.ajouterUtilisateur(
+                request.getUsername(),
+                request.getPassword(),
+                request.getEmail(),
+                request.getNom(),
+                request.getPrénom(),
+                request.getTéléphone(),
+                request.getType() // au lieu de role
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Utilisateur ajouté avec succès"));
     }
+
     @PostMapping("/authenticate")
     public ResponseEntity<?> authenticate(@RequestBody LoginRequest request) {
         try {
+            // Appelle le service pour authentifier
             LoginResponse response = service.authenticate(request);
 
-            // Vérifiez que le token est bien généré et transmis
+            // Vérifie que le token est bien généré
             if (response.getToken() == null || response.getToken().isEmpty()) {
                 log.error("🚨 Le token n'a pas été généré !");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(Map.of("message", "Erreur interne : token non généré"));
             }
 
-            log.info("✅ Token généré avec succès : {}", response.getToken());
+            log.info("✅ Authentification réussie pour utilisateur : {}", request.getUsername());
             return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            log.error("🚨 Erreur d'authentification : {}", e.getMessage());
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+
+        } catch (UsernameNotFoundException e) {
+            log.warn("❌ Utilisateur non trouvé : {}", request.getUsername());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Nom d'utilisateur ou mot de passe invalide"));
+
+        } catch (BadCredentialsException e) {
+            log.warn("❌ Mot de passe invalide pour : {}", request.getUsername());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Nom d'utilisateur ou mot de passe invalide"));
+
+        } catch (Exception e) {
+            log.error("🚨 Erreur d'authentification : {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erreur lors de l'authentification"));
         }
     }
+
     @PutMapping("/secretaires/{id}")
     @PreAuthorize("hasRole('MEDECIN')") // Seuls les médecins peuvent modifier
     public ResponseEntity<?> modifierSecretaire(@PathVariable Long id, @RequestBody RegisterRequest request) {
         try {
-            log.info("Modification de l'utilisateur ID={} avec role={}", id, request.getRole());
+          //  log.info("Modification de l'utilisateur ID={} avec role={}", id, request.getRole());
             service.modifierUtilisateur(id, request);
             return ResponseEntity.ok(Map.of("message", "Secrétaire modifiée avec succès"));
         } catch (Exception e) {

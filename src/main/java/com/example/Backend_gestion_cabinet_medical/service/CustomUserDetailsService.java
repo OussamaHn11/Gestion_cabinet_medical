@@ -1,17 +1,21 @@
 package com.example.Backend_gestion_cabinet_medical.service;
 
-import com.example.Backend_gestion_cabinet_medical.entity.Role; // Import de votre enum Role
+import com.example.Backend_gestion_cabinet_medical.entity.Medecin;
+import com.example.Backend_gestion_cabinet_medical.entity.Secretaire;
 import com.example.Backend_gestion_cabinet_medical.entity.Utilisateur;
 import com.example.Backend_gestion_cabinet_medical.repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service("customUserDetailsService")
+@Primary
 public class CustomUserDetailsService implements UserDetailsService {
+
     @Autowired
     private UtilisateurRepository utilisateurRepository;
 
@@ -20,19 +24,19 @@ public class CustomUserDetailsService implements UserDetailsService {
         Utilisateur utilisateur = utilisateurRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé : " + username));
 
-        // Récupérer le rôle directement depuis l'utilisateur
-        Role role = utilisateur.getRole(); // Suppose que Utilisateur a une méthode getRole() retournant l'enum Role
-
-        if (role == null) {
-            throw new IllegalStateException("Rôle non défini pour l'utilisateur : " + username);
+        // Utiliser instanceof pour détecter le type
+        String roleName;
+        if (utilisateur instanceof Medecin) {
+            roleName = "MEDECIN";
+        } else if (utilisateur instanceof Secretaire) {
+            roleName = "SECRETAIRE";
+        } else {
+            roleName = "UTILISATEUR"; // fallback si besoin
         }
-
-        // Convertir l'enum Role en String pour Spring Security
-        String roleName = role.name(); // Retourne "SECRETAIRE" ou "MEDECIN"
 
         return User.withUsername(utilisateur.getUsername())
                 .password(utilisateur.getPassword())
-                .roles(roleName) // Passer directement le nom du rôle
+                .roles(roleName)
                 .build();
     }
 }

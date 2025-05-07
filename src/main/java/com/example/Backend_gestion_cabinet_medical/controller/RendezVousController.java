@@ -1,5 +1,6 @@
 package com.example.Backend_gestion_cabinet_medical.controller;
 
+import com.example.Backend_gestion_cabinet_medical.dto.RendezVousRequest;
 import com.example.Backend_gestion_cabinet_medical.entity.RendezVous;
 import com.example.Backend_gestion_cabinet_medical.service.RendezVousService;
 import lombok.RequiredArgsConstructor;
@@ -29,15 +30,15 @@ public class RendezVousController {
     }
 
     @PostMapping
-    public ResponseEntity<RendezVous> createRendezVous(@RequestBody RendezVous rendezVous) {
-        RendezVous createdRdv = rendezVousService.saveRendezVous(rendezVous);
+    public ResponseEntity<RendezVous> createRendezVous(@RequestBody RendezVousRequest request) {
+        RendezVous createdRdv = rendezVousService.saveRendezVous(request);
         return ResponseEntity.ok(createdRdv);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<RendezVous> updateRendezVous(@PathVariable Long id, @RequestBody RendezVous updatedRdv) {
+    public ResponseEntity<RendezVous> updateRendezVous(@PathVariable Long id, @RequestBody RendezVousRequest request) {
         try {
-            RendezVous rdv = rendezVousService.updateRendezVous(id, updatedRdv);
+            RendezVous rdv = rendezVousService.updateRendezVous(id, request);
             return ResponseEntity.ok(rdv);
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();

@@ -1,7 +1,6 @@
 package com.example.Backend_gestion_cabinet_medical.service;
-import java.time.LocalDate;
 
-import com.example.Backend_gestion_cabinet_medical.DTO.PatientRequest;
+import com.example.Backend_gestion_cabinet_medical.dto.PatientRequest;
 import com.example.Backend_gestion_cabinet_medical.entity.DossierMedical;
 import com.example.Backend_gestion_cabinet_medical.entity.Patient;
 import com.example.Backend_gestion_cabinet_medical.entity.Utilisateur;
@@ -16,6 +15,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PatientService {
+
     private final PatientRepository patientRepository;
     private final UtilisateurRepository utilisateurRepository;
 
@@ -26,10 +26,10 @@ public class PatientService {
 
         Patient patient = new Patient();
         patient.setNom(request.getNom());
-        patient.setPrénom(request.getPrénom());
+        patient.setPrenom(request.getPrenom()); // correction ici
         patient.setTelephone(request.getTelephone());
         patient.setEmail(request.getEmail());
-        patient.setDate_nessance(request.getDate_nessance());
+        patient.setDateNaissance(request.getDateNaissance()); // correction ici
         patient.setUtilisateur(utilisateur);
 
         // Créer un dossier médical vide
@@ -42,27 +42,28 @@ public class PatientService {
         return patientRepository.save(patient);
     }
 
-    // Lister les patients
+    // Lister tous les patients
     public List<Patient> listerPatients(Authentication authentication) {
-        String username = authentication.getName();
-        return patientRepository.findAll();
+        return patientRepository.findAll(); // Optionnel : filtrer par utilisateur
     }
-    //Lister un patient
-    public Patient getPatientById(Long id) {
+
+    // Obtenir un patient par ID
+    public Patient obtenirPatientParId(Long id) {
         return patientRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Patient non trouvé"));
     }
-
 
     // Modifier un patient
     public Patient modifierPatient(Long id, PatientRequest request, Authentication authentication) {
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Patient non trouvé"));
+
         patient.setNom(request.getNom());
-        patient.setPrénom(request.getPrénom());
+        patient.setPrenom(request.getPrenom()); // correction ici
         patient.setTelephone(request.getTelephone());
         patient.setEmail(request.getEmail());
-        patient.setDate_nessance(request.getDate_nessance());
+        patient.setDateNaissance(request.getDateNaissance()); // correction ici
+
         return patientRepository.save(patient);
     }
 
@@ -70,8 +71,6 @@ public class PatientService {
     public void supprimerPatient(Long id) {
         Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Patient non trouvé"));
-        patientRepository.delete(patient); // Le dossier médical sera supprimé via cascade
+        patientRepository.delete(patient);
     }
-
-
 }

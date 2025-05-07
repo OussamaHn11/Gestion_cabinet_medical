@@ -2,25 +2,28 @@ package com.example.Backend_gestion_cabinet_medical.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Data
-@Table(name = "rappel")
-public class Rappel {
+@Table(name = "examen_medical")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+public class ExamenMedical {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime sendDate;
-    private boolean sent;
-
+    private LocalDateTime date;
+    private String lieu;
 
     @ManyToOne
-    @JoinColumn(name = "rendez_vous_id", nullable = false)
+    @JoinColumn(name = "consultation_id")
     @JsonIgnore
-    private RendezVous rendezVous;
+    private Consultation consultation;
 }
