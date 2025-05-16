@@ -14,7 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/authentication")
 @RequiredArgsConstructor
@@ -34,12 +34,14 @@ public class AuthController {
                 request.getPassword(),
                 request.getEmail(),
                 request.getNom(),
-                request.getPrénom(),
-                request.getTéléphone(),
-                request.getType() // au lieu de role
+                request.getPrenom(),
+                request.getTelephone(),
+                request.getType(),
+                request.getSpecialite()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Utilisateur ajouté avec succès"));
     }
+
 
     @PostMapping("/authenticate")
     public ResponseEntity<?> authenticate(@RequestBody LoginRequest request) {

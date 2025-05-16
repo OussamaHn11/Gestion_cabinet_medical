@@ -28,15 +28,15 @@ public class AuthService {
     private final UtilisateurRepository repository;
     private final PasswordEncoder passwordEncoder;
 
-    public void ajouterUtilisateur(String username, String password, String email, String nom, String prénom, String téléphone, String type) {
+    public void ajouterUtilisateur(String username, String password, String email, String nom, String prenom, String telephone, String type, String specialite) {
         String encodedPassword = passwordEncoder.encode(password);
-
         Utilisateur utilisateur;
+
         if ("SECRETAIRE".equalsIgnoreCase(type)) {
             utilisateur = new Secretaire();
         } else if ("MEDECIN".equalsIgnoreCase(type)) {
             Medecin medecin = new Medecin();
-            medecin.setSpecialite("Généraliste"); // à adapter si nécessaire
+            medecin.setSpecialite(specialite != null ? specialite : "Généraliste");
             utilisateur = medecin;
         } else {
             throw new IllegalArgumentException("Type d'utilisateur inconnu : " + type);
@@ -46,9 +46,9 @@ public class AuthService {
         utilisateur.setPassword(encodedPassword);
         utilisateur.setEmail(email);
         utilisateur.setNom(nom);
-        utilisateur.setPrenom(prénom);
-        utilisateur.setTelephone(téléphone);
-
+        utilisateur.setPrenom(prenom);
+        utilisateur.setTelephone(telephone);
+utilisateur.setType(type);
         repository.save(utilisateur);
         log.info("✅ Utilisateur enregistré : {}", username);
     }
@@ -66,13 +66,13 @@ public class AuthService {
         UserDetails userDetails = User.builder()
                 .username(utilisateur.getUsername())
                 .password(utilisateur.getPassword())
-                .roles(role)
+                .roles(role) // rôle sans "ROLE_" car hasRole attend juste "MEDECIN" par défaut
                 .build();
 
         String token = jwtService.generateToken(userDetails);
 
         List<String> roles = userDetails.getAuthorities().stream()
-                .map(auth -> auth.getAuthority())
+                .map(auth -> auth.getAuthority()) // Ex: ROLE_MEDECIN
                 .collect(Collectors.toList());
 
         log.info("🔐 Token généré pour : {} | Rôles = {}", utilisateur.getUsername(), roles);
@@ -89,8 +89,8 @@ public class AuthService {
         if (request.getUsername() != null) utilisateur.setUsername(request.getUsername());
         if (request.getEmail() != null) utilisateur.setEmail(request.getEmail());
         if (request.getNom() != null) utilisateur.setNom(request.getNom());
-        if (request.getPrénom() != null) utilisateur.setPrenom(request.getPrénom());
-        if (request.getTéléphone() != null) utilisateur.setTelephone(request.getTéléphone());
+        if (request.getPrenom() != null) utilisateur.setPrenom(request.getPrenom());
+        if (request.getTelephone() != null) utilisateur.setTelephone(request.getTelephone());
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
             utilisateur.setPassword(passwordEncoder.encode(request.getPassword()));
         }
@@ -114,8 +114,8 @@ public class AuthService {
         if (request.getUsername() != null) utilisateur.setUsername(request.getUsername());
         if (request.getEmail() != null) utilisateur.setEmail(request.getEmail());
         if (request.getNom() != null) utilisateur.setNom(request.getNom());
-        if (request.getPrénom() != null) utilisateur.setPrenom(request.getPrénom());
-        if (request.getTéléphone() != null) utilisateur.setTelephone(request.getTéléphone());
+        if (request.getPrenom() != null) utilisateur.setPrenom(request.getPrenom());
+        if (request.getTelephone() != null) utilisateur.setTelephone(request.getTelephone());
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
             utilisateur.setPassword(passwordEncoder.encode(request.getPassword()));
         }

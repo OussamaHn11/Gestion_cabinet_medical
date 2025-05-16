@@ -16,9 +16,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true)
-
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration {
 
     private final AuthenticationProvider authenticationProvider;
@@ -35,34 +34,32 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()  // Disable CSRF protection for stateless API
-                .authorizeHttpRequests()  // New syntax to authorize requests
-                .requestMatchers("/api/authentication/authenticate").permitAll()
-                .requestMatchers("/api/authentication/register").permitAll()
-                .requestMatchers("/api/authentication/profile").authenticated()
-                .requestMatchers("/api/medicaments/**").permitAll() // <-- BIEN AJOUTÉ ?
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/authentication/register", "/api/authentication/authenticate").permitAll()
+                        .requestMatchers("/api/authentication/profile").authenticated()
+                        .requestMatchers("/api/medecin/**").hasRole("MEDECIN")
+                        .requestMatchers("/api/secretaire/**").hasRole("SECRETAIRE")
+                        .anyRequest().authenticated()
+                )
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-                .anyRequest().authenticated()  // All other requests require authentication
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // Stateless authentication
-                .and()
-                .authenticationProvider(authenticationProvider)  // Custom authentication provider (if any)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);  // Add JWT filter to the chain
-
-        return http.build();  // Return the HttpSecurity configuration
+        return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:8089"));  // Allow specific origins
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));  // Allow these methods
-        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));  // Allow necessary headers
+        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // peut mettre "*" en local si nécessaire
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);  // Apply this CORS configuration to all routes
-
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 }

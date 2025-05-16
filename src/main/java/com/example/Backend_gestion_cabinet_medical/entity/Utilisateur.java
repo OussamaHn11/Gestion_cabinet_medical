@@ -35,6 +35,8 @@ public class Utilisateur {
 
     @Column(nullable = false, unique = true)
     private String email;
+    @Column(nullable = false)
+    private String type;
 
     @JsonIgnore
     @Column(nullable = false)

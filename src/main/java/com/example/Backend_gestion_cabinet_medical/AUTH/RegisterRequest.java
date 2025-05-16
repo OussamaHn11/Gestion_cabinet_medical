@@ -10,11 +10,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegisterRequest {
-
-    private String nom;
     private String username;
-    private String téléphone;
-    private String email;
     private String password;
-    private String prénom ;
-    private String type; }
+    private String email;
+    private String nom;
+    private String prenom;
+    private String telephone;
+    private String type; // "MEDECIN" ou "SECRETAIRE"
+    private String specialite; // facultatif, requis uniquement si MEDECIN
+}
